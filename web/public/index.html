@@ -6,6 +6,11 @@
 <body>
 <h1>FCM Push Notifications</h1>
 <button id="subscribeBtn">Subscribe</button>
+<button id="unsubscribeBtn">Unsubscribe</button>
+<br/>
+<button id="subscribeToTopicBtn">Subscribe to topic</button>
+<button id="unsubscribeToTopicBtn">Unsubscribe to topic</button>
+
 <script type="module">
     import {initializeApp} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import {getMessaging, getToken} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging.js";
@@ -29,25 +34,58 @@
             });
     }
 
-    document.getElementById('subscribeBtn').addEventListener('click', function () {
+    function tokenAccessor(callback) {
         getToken(messaging, {vapidKey: 'BO3SiS5NhjM_ScaGaRaefVg3EeuGzto5bf48H9NnzbYvuAtlTItmaJzSaMk6XzEq0RBFrbY8oyZqDclIL813YLw'})
             .then(token => {
                 console.log('FCM Token:', token);
-                window.pulse_token = token;
-                return fetch('https://localhost:8080/subscribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({registrationToken: token})
-                });
+                return callback(token);
             })
             .then(() => {
-                console.log("Subscribed.");
+                console.log("Completed callback.");
             })
             .catch(error => {
                 console.error('Error getting permission or token:', error);
             });
+    }
+
+    document.getElementById('subscribeBtn').addEventListener('click', () => {
+        tokenAccessor((token) => {
+            return fetch('https://localhost:8080/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({registrationToken: token})
+            });
+        });
+    });
+
+    document.getElementById('unsubscribeBtn').addEventListener('click', () => {
+        tokenAccessor((token) => {
+            return fetch(`https://localhost:8080/unsubscribe/${token}`, {
+                method: 'DELETE'
+            });
+        });
+    });
+
+    document.getElementById('subscribeToTopicBtn').addEventListener('click', () => {
+        tokenAccessor((token) => {
+            return fetch(`https://localhost:8080/subscribe/topic/pulse`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({registrationToken: token})
+            });
+        });
+    });
+
+    document.getElementById('unsubscribeToTopicBtn').addEventListener('click', () => {
+        tokenAccessor((token) => {
+            return fetch(`https://localhost:8080/unsubscribe/${token}/topic/pulse`, {
+                method: 'DELETE'
+            });
+        });
     });
 </script>
 </body>

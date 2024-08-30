@@ -30,6 +30,22 @@ public class MessageController {
                 .then(Mono.just(ResponseEntity.noContent().build()));
     }
 
+    @PostMapping("/subscribe/topic/{topic}")
+    public Mono<ResponseEntity<Void>> subscribeToTopic(@PathVariable String topic, @RequestBody Subscription subscription) {
+        return Mono.fromCallable(() -> {
+            messageService.subscribeToTopic(subscription, topic);
+            return null;
+        }).then(Mono.just(ResponseEntity.ok().build()));
+    }
+
+    @DeleteMapping("/unsubscribe/{token}/topic/{topic}")
+    public Mono<ResponseEntity<Void>> unsubscribeFromTopic(@PathVariable("token") String registrationToken, @PathVariable String topic) {
+        return Mono.fromCallable(() -> {
+            messageService.unsubscribeFromTopic(registrationToken, topic);
+            return null;
+        }).then(Mono.just(ResponseEntity.ok().build()));
+    }
+
     @PostMapping("/send/notification/{to}")
     public Mono<ResponseEntity<Void>> sendNotification(@PathVariable String to, @RequestBody CreateMessage createMessage) {
         return Mono.fromCallable(() -> {

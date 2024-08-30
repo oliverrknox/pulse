@@ -6,6 +6,7 @@ import net.gb.knox.pulse.domain.Subscription;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -19,6 +20,14 @@ public class MessageService {
 
     public void unsubscribe(String registrationToken) {
         subscribers.remove(registrationToken);
+    }
+
+    public void subscribeToTopic(Subscription subscription, String topic) throws FirebaseMessagingException {
+        FirebaseMessaging.getInstance().subscribeToTopic(List.of(subscription.registrationToken()), topic);
+    }
+
+    public void unsubscribeFromTopic(String registrationToken, String topic) throws FirebaseMessagingException {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(registrationToken), topic);
     }
 
     public void sendNotification(String to, CreateMessage createMessage) throws Exception {
