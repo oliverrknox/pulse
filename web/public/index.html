@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FCM Push Notifications</title>
+</head>
+<body>
+<h1>FCM Push Notifications</h1>
+<button id="subscribeBtn">Subscribe</button>
+<script type="module">
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import {getMessaging, getToken} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging.js";
+
+    const firebaseConfig = await fetch("/firebase-config.json")
+        .then(response => response.json())
+        .catch(error => {
+            console.error('Error getting firebase config:', error);
+        });
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+
+    document.getElementById('subscribeBtn').addEventListener('click', function () {
+        getToken(messaging, {vapidKey: 'BO3SiS5NhjM_ScaGaRaefVg3EeuGzto5bf48H9NnzbYvuAtlTItmaJzSaMk6XzEq0RBFrbY8oyZqDclIL813YLw'})
+            .then(token => {
+                console.log('FCM Token:', token);
+                window.pulse_token = token;
+                return fetch('https://localhost:8080/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({registrationToken: token})
+                });
+            })
+            .then(() => {
+                console.log("Subscribed.");
+            })
+            .catch(error => {
+                console.error('Error getting permission or token:', error);
+            });
+    });
+</script>
+</body>
+</html>

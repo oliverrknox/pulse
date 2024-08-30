@@ -1,0 +1,14 @@
+{
+  "name": "net.gb.knox.pulse.web",
+  "version": "0.0.1",
+  "description": "A web client for push notifications.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Oliver Knox",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
