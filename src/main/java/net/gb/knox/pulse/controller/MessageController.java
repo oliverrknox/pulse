@@ -20,6 +20,7 @@ public class MessageController {
 
     @PostMapping("/subscribe")
     public Mono<ResponseEntity<Void>> subscribe(@RequestBody Subscription subscription) {
+        System.out.println("Subscribing " + subscription);
         return Mono.fromRunnable(() -> messageService.subscribe(subscription))
                 .then(Mono.just(ResponseEntity.ok().build()));
     }
