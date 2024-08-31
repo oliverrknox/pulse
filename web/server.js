@@ -6,10 +6,8 @@ const express = require('express');
 
 const app = express();
 
-const certsDir = path.join(os.homedir(), 'certs');
-
-const privateKey = fs.readFileSync(path.join(certsDir, 'localhost-key.pem'), 'utf8');
-const certificate = fs.readFileSync(path.join(certsDir, 'localhost.pem'), 'utf8');
+const privateKey = fs.readFileSync('./resources/localhost-key.pem', 'utf8');
+const certificate = fs.readFileSync('./resources/localhost.pem', 'utf8');
 const credentials = {key: privateKey, cert: certificate};
 
 app.use(express.static('public'));

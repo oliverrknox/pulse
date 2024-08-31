@@ -9,5 +9,18 @@ importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js')
         });
 
     firebase.initializeApp(firebaseConfig);
-    firebase.messaging();
+    const messaging = firebase.messaging();
+
+    messaging.onBackgroundMessage((payload) => {
+        console.log('Received background message: ', payload);
+
+        // Customize the notification here
+        const notificationTitle = payload.notification.title;
+        const notificationOptions = {
+            body: payload.notification.body,
+            icon: payload.notification.icon
+        };
+
+        self.registration.showNotification(notificationTitle, notificationOptions);
+    });
 })()
