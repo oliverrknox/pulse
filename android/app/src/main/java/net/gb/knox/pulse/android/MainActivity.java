@@ -20,6 +20,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import net.gb.knox.pulse.android.service.MessageService;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -48,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
 
         Button subscribeButton = findViewById(R.id.subscribe);
         subscribeButton.setOnClickListener(v -> subscribe(MessageService.getToken()));
+
+        Button unsubscribeButton = findViewById(R.id.unsubscribe);
+        unsubscribeButton.setOnClickListener(v -> unsubscribe(MessageService.getToken()));
+
+        Button subscribeToTopicButton = findViewById(R.id.subscribe_to_topic);
+        subscribeToTopicButton.setOnClickListener(v -> subscribeToTopic(MessageService.getToken()));
+
+        Button unsubscribeFromTopicButton = findViewById(R.id.unsubscribe_from_topic);
+        unsubscribeFromTopicButton.setOnClickListener(v -> unsubscribeFromTopic(MessageService.getToken()));
 
         FirebaseApp.initializeApp(this);
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
@@ -78,23 +88,58 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void subscribe(String token) {
-        Log.d(TAG, "Sending token to server...");
+        Log.d(TAG, "Subscribing to server...");
+        sendRequest("POST", "https://10.0.2.2:8080/subscribe", (conn -> {
+            String jsonInputString = "{\"registrationToken\": \"" + token + "\"}";
+            Log.d(TAG, "Request body: " + jsonInputString);
+
+            OutputStream os = conn.getOutputStream();
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }));
+    }
+
+    private void unsubscribe(String token) {
+        Log.d(TAG, "Unsubscribe to server...");
+        sendRequest("DELETE", "https://10.0.2.2:8080/unsubscribe/" + token);
+    }
+
+    private void subscribeToTopic(String token) {
+        Log.d(TAG, "Subscribing to topic on server...");
+        sendRequest("POST", "https://10.0.2.2:8080/subscribe/topic/pulse", (conn -> {
+            String jsonInputString = "{\"registrationToken\": \"" + token + "\"}";
+            Log.d(TAG, "Request body: " + jsonInputString);
+
+            OutputStream os = conn.getOutputStream();
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }));
+    }
+
+    private void unsubscribeFromTopic(String token) {
+        Log.d(TAG, "Unsubscribe from topic on server...");
+        sendRequest("DELETE", "https://10.0.2.2:8080/unsubscribe/" + token + "/topic/pulse");
+    }
+
+    private void sendRequest(String method, String path) {
+        sendRequest(method, path, (conn) -> {});
+    }
+
+    @FunctionalInterface
+    public interface RequestBody {
+        void apply(HttpURLConnection connection) throws IOException;
+    }
+
+    private void sendRequest(String method, String path, RequestBody requestBody) {
         executorService.execute(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:8080/subscribe"); // Use the appropriate URL
+                URL url = new URL(path);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
+                conn.setRequestMethod(method);
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setDoOutput(true);
 
-                String jsonInputString = "{\"registrationToken\": \"" + token + "\"}";
-
-                Log.d(TAG, "Request body: " + jsonInputString);
-
-                try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
-                }
+                requestBody.apply(conn);
 
                 int responseCode = conn.getResponseCode();
                 Log.d(TAG, "Response code: " + responseCode);
@@ -105,6 +150,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
