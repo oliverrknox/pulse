@@ -8,9 +8,3 @@ server:
     keystore-password: test1234
     key-store-type: PKCS12
     key-alias: mysslkey
-
-logging:
-  level:
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web.reactive.config: DEBUG
