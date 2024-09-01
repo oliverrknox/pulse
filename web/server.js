@@ -1,6 +1,4 @@
 const fs = require('fs');
-const os = require('os');
-const path = require('path');
 const https = require('https');
 const express = require('express');
 
@@ -24,7 +22,7 @@ app.get('/firebase-config.json', (req, res) => {
 
     res.setHeader("Content-Type", "application/json");
     res.send(firebaseConfig);
-})
+});
 
 const port = 8443;
 https.createServer(credentials, app).listen(port, () => {
