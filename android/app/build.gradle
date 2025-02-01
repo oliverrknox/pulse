@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'net.gb.knox.pulse.android'
+    namespace 'io.oliverknox.pulse.android'
     compileSdk 34
 
     defaultConfig {
-        applicationId "net.gb.knox.pulse.android"
+        applicationId "io.oliverknox.pulse.android"
         minSdk 24
         targetSdk 34
         versionCode 1

@@ -108,6 +108,8 @@ To run the android client
 
 - Open Android Studio at the root or `/android` directory.
 - Start `MainActivity.java`.
+
+> If running in IntelliJ then ensure that Java 17 is used for Gradle.
   
 To run the web client
 

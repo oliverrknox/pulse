@@ -8,7 +8,7 @@
         <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>net.gb.knox</groupId>
+    <groupId>io.oliverknox</groupId>
     <artifactId>pulse</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pulse</name>

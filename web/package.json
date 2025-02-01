@@ -1,5 +1,5 @@
 {
-  "name": "net.gb.knox.pulse.web",
+  "name": "io.oliverknox.pulse.web",
   "version": "0.0.1",
   "description": "A web client for push notifications.",
   "main": "index.js",
